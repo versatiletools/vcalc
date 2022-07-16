@@ -2,6 +2,7 @@ from tokenize import generate_tokens
 from io import StringIO
 from datastructure import BTree, NODE_TYPE, OP_PRIORITIES
 
+
 def token_split(data:str):
     result = []
     tokens = generate_tokens(StringIO(data).readline)
@@ -81,8 +82,10 @@ class Preprocessor:
         self.__equation = equation
 
     def process(self, equation:str):
-        self.__equation = equation.strip()
+        # Initialize
+        self.root = None
 
+        self.__equation = equation.strip()
         if not self.is_valid(self.__equation):
             return None
 
@@ -99,7 +102,6 @@ class Preprocessor:
         while True:
             c = tokens.pop()
 
-            self.root = self.root
             if c is None or c == "":
                 break
             elif c == "(":
@@ -112,7 +114,7 @@ class Preprocessor:
                 if self.root == current_node:
                     self.root = node
                     node.left = current_node
-                elif current_node.parent.priority <= priority:
+                elif current_node.parent.priority < priority:
                     current_node.parent.right = node
                     node.left = current_node
                 else:
@@ -130,12 +132,14 @@ class Preprocessor:
                         self.root = node
 
             elif c.isdigit():
-                node = BTree(c, NODE_TYPE.DIGIT)
+                node = BTree(float(c), NODE_TYPE.DIGIT)
                 if self.root is None:
                     self.root = node
                 elif current_node.type == NODE_TYPE.OPERATION:  #   OP
                     current_node.right = node                   #  / \
                                                                 # D   D(node)
+                else:
+                    raise RuntimeError("Invalid data : ", self.data)
 
             current_node = node
 
