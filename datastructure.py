@@ -43,12 +43,26 @@ class BTree:
     Binary Tree class for a parser tree
     """
     def __init__(self, data, type, priority=OP_PRIORITIES.NONE, left=None, right=None, parent=None):
-        self.data = data
+        self._data = data
         self._left = left
         self._right = right
         self._parent = parent
         self.type = type
         self._priority = priority
+
+    def __str__(self):
+        return str(self.data)
+
+    def __repr__(self):
+        return "BTree (%s, %s, %s)" % (str(self.data), str(self.data.left.data), str(self.data.right.data))
+
+    @property
+    def data(self) -> float:
+        return self._data
+
+    @data.setter
+    def data(self, value):
+        self._data = value
 
     @property
     def left(self):
