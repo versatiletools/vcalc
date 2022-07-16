@@ -1,3 +1,4 @@
+from datastructure import NODE_TYPE
 from preprocessor import Preprocessor
 
 
@@ -33,24 +34,31 @@ class Calculator:
     #
     #     return self.results
 
-    def _calc(self, equation):
-        stack = []
+    def _calc(self, p_tree):
+        left_value = 0
+        right_value = 0
 
-        for i in equation:
-            if i in Preprocessor.EQ_OPERATORS:
-                op1 = float(stack.pop())
-                op2 = float(stack.pop())
-                value = self.operation(op1, op2, i)
-                stack.append(value)
-            elif i == ")":
-                value = stack.pop()     # pop the last value
-                stack.pop()             # remove '('
-                stack.append(value)     # push the last value.
-                                        # This means that '(' and ')' are removed.
-            else:
-                stack.append(i)
+        # if node is a digit, just return it.
+        if p_tree.type == NODE_TYPE.DIGIT:
+            return p_tree.data
 
-        return stack.pop()
+        if p_tree is None:
+            return None
+
+        # Get left value. If the left node is a operator, recursive call.
+        if p_tree.left.type == NODE_TYPE.OPERATION:
+            left_value = self._calc(p_tree.left)
+        else:
+            left_value = p_tree.left.data
+
+        # Get right value. If the right node is a operator, recursive call.
+        if p_tree.right.type == NODE_TYPE.OPERATION:
+            right_value = self._calc(p_tree.right)
+        else:
+            right_value = p_tree.right.data
+
+        # Calculate and return the result.
+        return self.operation(left_value, right_value, p_tree.data)
 
     def operation(self, param1: float, param2: float, op: str) -> float:
         """
